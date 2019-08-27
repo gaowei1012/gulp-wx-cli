@@ -1,0 +1,8 @@
+<view class="wrapper">
+  <view class="container">
+    <view class="now">
+      <!--  -->
+      <text>this is test</text>
+    </view>
+  </view>
+</view>
