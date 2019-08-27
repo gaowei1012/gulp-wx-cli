@@ -1,2 +1,1 @@
-<view class="icon">
-</view>
+<text class="icon icon-{{type}}"></text>

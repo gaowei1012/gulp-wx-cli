@@ -2,75 +2,77 @@
  * @Description: gulp config
  * @Author: 执念
  * @Date: 2019-08-27 11:47:30
- * @LastEditTime: 2019-08-27 13:12:15
+ * @LastEditTime: 2019-08-27 18:26:56
  * @LastEditors: Please set LastEditors
  */
-const gulp = require("gulp");
-const rename = require("gulp-rename");
-const del = require("del");
-const through = require("through2");
-const colors = require("ansi-colors");
-const log = require("fancy-log");
+const gulp = require('gulp')
+const rename = require('gulp-rename')
+const del = require('del')
 
-const postcss = require("gulp-postcss");
-const pxtorpx = require("postcss-px2rpx");
-const base64 = require("postcss-font-base64");
+const through = require('through2')
+const colors = require('ansi-colors')
+const log = require('fancy-log')
 
-const htmlmin = require("gulp-htmlmin");
-const sass = require("gulp-sass");
-const jsonminify = require("gulp-jsonminify");
-const combiner = require("stream-combiner2");
-const babel = require("gulp-babel");
-const uglify = require("gulp-uglify");
-const cssnano = require("gulp-cssnano");
-const runSequence = require("run-sequence");
-const sourcemaps = require("gulp-sourcemaps");
-const filter = require("gulp-filter");
-const jdists = require("gulp-jdists");
+const postcss = require('gulp-postcss')
+const pxtorpx = require('postcss-px2rpx')
+const base64 = require('postcss-font-base64')
 
-const src = "./src";
-const dist = "./dist";
+const htmlmin = require('gulp-htmlmin')
+const sass = require('gulp-sass')
+const jsonminify = require('gulp-jsonminify')
+const combiner = require('stream-combiner2')
+const babel = require('gulp-babel')
+const uglify = require('gulp-uglify')
+const cssnano = require('gulp-cssnano')
+const runSequence = require('run-sequence')
+const sourcemaps = require('gulp-sourcemaps')
+const filter = require('gulp-filter')
+const jdists = require('gulp-jdists')
 
-const isProd = process.env.NODE_ENV === "production" || false; // devlpement
+const src = './src'
+const dist = './dist'
+const isProd = process.env.NODE_ENV === 'production' || false; // 'development'
 
 const handleError = (err) => {
-  console.log('\n');
+  console.log('\n')
   log(colors.red('Error!'))
   log('fileName: ' + colors.red(err.fileName))
   log('lineNumber: ' + colors.red(err.lineNumber))
   log('message: ' + err.message)
   log('plugin: ' + colors.yellow(err.plugin))
-};
+}
 
-gulp.task("json", () => {
-  return gulp.src(`${src}/**/*.json`).pipe(isProd ? jsonminify() : through.obj()).pipe(gulp.dest(dist));
-});
+// task start
+gulp.task('json', () => {
+  return gulp.src(`${src}/**/*.json`).pipe(isProd ? jsonminify() : through.obj()).pipe(gulp.dest(dist))
+})
 
-gulp.task("wxml", () => {
-  return gulp.src(`${src}/**/*.wxml`).pipe(gulp.dest(dist));
-});
+gulp.task('wxml', () => {
+  return gulp
+    .src(`${src}/**/*.wxml`)
+    .pipe(gulp.dest(dist))
+})
+gulp.task('wxs', () => {
+  return gulp.src(`${src}/**/*.wxs`).pipe(gulp.dest(dist))
+})
 
-gulp.task("wxs", () => {
-  return gulp.src(`${src}/**/*.wxs`).pipe(gulp.dest(dist));
-});
-
-gulp.task("wxss", () => {
+gulp.task('wxss', () => {
   const combined = combiner.obj([
     gulp.src(`${src}/**/*.{wxss,scss}`),
-    sass().on("error", sass.logError),
+    sass().on('error', sass.logError),
     postcss([pxtorpx(), base64()]),
     isProd
       ? cssnano({
           autoprefixer: false,
-          discardComments: { removeAll: true }
+          discardComments: {removeAll: true}
         })
       : through.obj(),
-    rename(path => (path.extname = ".wxss")),
+    rename((path) => (path.extname = '.wxss')),
     gulp.dest(dist)
-  ]);
+  ])
 
-  combined.on("error", handleError);
-});
+  combined.on('error', handleError)
+})
 
 gulp.task('images', () => {
   return gulp.src(`${src}/images/**`).pipe(gulp.dest(`${dist}/images`))
@@ -127,8 +129,8 @@ gulp.task('build', ['clean'], () => {
   runSequence('json', 'images', 'wxml', 'wxss', 'js', 'wxs', 'cloud')
 })
 
-// cloud-functions
-const cloudPath = './src/cloud-functions'
+// cloud-functions 处理方法
+const cloudPath = './server/cloud-functions'
 gulp.task('cloud', () => {
   return gulp
     .src(`${cloudPath}/**`)
