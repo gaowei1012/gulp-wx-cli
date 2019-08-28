@@ -2,7 +2,7 @@
  * @Description: wx cloud server index 
  * @Author: your name
  * @Date: 2019-08-27 18:50:32
- * @LastEditTime: 2019-08-28 10:59:15
+ * @LastEditTime: 2019-08-28 17:40:06
  * @LastEditors: Please set LastEditors
  */
 const path = require('path');
@@ -13,8 +13,6 @@ const heAir = require('./cloud-functions/he-air').main;
 const heWeather = require('./cloud-functions/he-weather').main;
 const gecoder = require('./cloud-functions/geocoder').mian;
 const jscode2session = require('./cloud-functions/jscode2session').main;
-
-console.log(heAir)
 
 const app = express()
 

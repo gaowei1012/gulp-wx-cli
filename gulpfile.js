@@ -2,7 +2,7 @@
  * @Description: gulp config
  * @Author: 执念
  * @Date: 2019-08-27 11:47:30
- * @LastEditTime: 2019-08-28 09:26:37
+ * @LastEditTime: 2019-08-28 17:44:21
  * @LastEditors: Please set LastEditors
  */
 const gulp = require('gulp')
@@ -130,7 +130,7 @@ gulp.task('build', ['clean'], () => {
 })
 
 // cloud-functions 处理方法
-const cloudPath = './server/cloud-functions'
+const cloudPath = './src/server/cloud-functions'
 gulp.task('cloud', () => {
   return gulp
     .src(`${cloudPath}/**`)

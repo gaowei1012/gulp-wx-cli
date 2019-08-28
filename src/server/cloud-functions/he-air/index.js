@@ -2,14 +2,16 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-27 18:52:56
- * @LastEditTime: 2019-08-27 20:01:54
+ * @LastEditTime: 2019-08-28 17:58:01
  * @LastEditors: Please set LastEditors
  */
 const he_url = 'https://free-api.heweather.net/s6/air/now';
-
 const request = require('request');
+/*<jdists import="../../inline/utils.js" />*/
 
-const $ = require('../../inline/utils');
+/*<remove>*/
+const $ = require('../../inline/utils')
+/*</remove>*/
 
 exports.main = async (event) => {
   // let location = event.city;
