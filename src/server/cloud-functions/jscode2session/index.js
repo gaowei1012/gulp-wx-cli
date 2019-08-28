@@ -2,7 +2,7 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-27 18:53:09
- * @LastEditTime: 2019-08-28 11:00:36
+ * @LastEditTime: 2019-08-28 11:12:16
  * @LastEditors: Please set LastEditors
  */
 
@@ -26,7 +26,7 @@ exports.main = async (event) => {
   };
 
   let url = `${WX_API}?${querystring.stringify(data)}`;
-  console.log(url)
+  //console.log(url)
 
   return new Promise((resolve, reject) => {
     request.get(url, (err, response, body) => {
@@ -35,9 +35,9 @@ exports.main = async (event) => {
       } else {
         try {
           let res = JSON.parse(body)
+          //console.log(res)
           console.log(res)
-          console.log(res)
-          resolve(res)
+          //resolve(res)
         } catch (e) {
           reject(e)
         }
