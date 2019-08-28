@@ -2,10 +2,10 @@
  * @Description: 
  * @Author: your name
  * @Date: 2019-08-27 12:26:34
- * @LastEditTime: 2019-08-27 18:48:58
+ * @LastEditTime: 2019-08-28 10:18:40
  * @LastEditors: Please set LastEditors
  */
-import { gecoder } from '../../lib/api'
+import { gecoder, getAir, getWeather, jscode2session } from '../../lib/api-mock';
 
 Page({
   data: {
@@ -38,6 +38,10 @@ Page({
   },
   onLoad: function() {
 
+    // 获取天气预报
+    //this.getWeatherData()
+    // 获取weather air 信息
+    thi.getWeatherAirData()
     // 计算头部定位地址距离顶部的位置
     wx.getSystemInfo({
       success: (result)=>{
@@ -56,6 +60,28 @@ Page({
     });
 
     this.getLocation()
+  },
+  getWeatherData() {
+    wx.showLoading({
+      title: '定位中...',
+      mask: true,
+    })
+    // 获取用户位置
+    wx.getLocation({
+      success(res) {
+        let lat = res.latitude;
+        let lon = res.longitude;
+
+        console.log(lat, lon)
+        getWeather(lat, lon)
+
+        wx.hideLoading()
+      }
+    })
+  },
+  getWeatherAirData() {
+    // 根据城市信息获取城市描述
+    getAir()
   },
   // 逆向坐标处理
   getAddress(lat, lng, name) {
@@ -96,10 +122,6 @@ Page({
       }
       fail
     })
-  },
-  // 获取天气预报数据
-  getWeatherData() {
-
   },
   // 获取位置信息
   getLocation() {
