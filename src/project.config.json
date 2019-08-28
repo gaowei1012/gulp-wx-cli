@@ -1,3 +1,4 @@
 {
+  "cloudfunctionRoot": "./cloud-functions",
   "appid": "wxbde07b4f35495337"
 }

@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "server": "nodemon ./src/server/index.js",
     "clean": "gulp clean",
     "dev": "gulp dev",
     "start": "gulp watch",
