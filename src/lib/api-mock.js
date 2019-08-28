@@ -2,7 +2,7 @@
  * @Description: api mock
  * @Author: 执念
  * @Date: 2019-08-28 09:45:36
- * @LastEditTime: 2019-08-28 10:05:10
+ * @LastEditTime: 2019-08-28 15:11:32
  * @LastEditors: Please set LastEditors
  */
 import Promise from './bluebird';

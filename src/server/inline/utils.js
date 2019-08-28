@@ -2,7 +2,7 @@
  * @Description: cloud functions utils
  * @Author: 执念
  * @Date: 2019-08-27 19:03:32
- * @LastEditTime: 2019-08-27 20:14:33
+ * @LastEditTime: 2019-08-28 12:11:08
  * @LastEditors: Please set LastEditors
  */
 const path = require('path')

@@ -17,17 +17,17 @@
       </view>
       <view class="now-weather">
         <view class="temp">
-          <text>{{ current.temp }}</text>
+          <text>{{ today_temp }}</text>
           <text class="degree">°</text>
         </view>
         <view class="cur-weather">
           <view class="inline">
-            <icon type="{{ current.icon }}"></icon>
-            <text>{{ current.weather }}</text>
+            <!-- <icon type="{{ icon }}"></icon> -->
+            <text>{{ today_weather }}</text>
           </view>
           <view class="inline today">
-            <text class="item">{{ utils.humidity(current.humidity) }}</text>
-            <text class="item">{{ utils.wind(current.wind, current.windLevel) }}</text>
+            <text class="item">{{ utils.humidity(today_humidity) }}</text>
+            <text class="item">{{ utils.wind(today_wind, today_windLevel) }}</text>
           </view>
         </view>
         <view class="tips" wx:if="{{tips}}">
@@ -39,21 +39,21 @@
       <view class="item">
         <view class="top">
           <text class="date">今天</text>
-          <text class="temp">{{ today.temp }}</text>
+          <text class="temp">{{ today_temp_min }}/{{today_temp_max}}°</text>
         </view>
         <view class="bottom">
-          <text>{{ today.weather }}</text>
-          <icon type="{{ today.icon }}" class="logo"></icon>
+          <text>{{ today_weather }}</text>
+          <icon type="{{ today_icon }}" class="logo"></icon>
         </view>
       </view>
       <view class="item">
         <view class="top">
           <text class="date">明天</text>
-          <text class="temp">{{ tomorrow.temp }}</text>
+          <text class="temp">{{ tomorrow_temp_min}}/{{tomorrow_temp_max }}°</text>
         </view>
         <view class="bottom">
-          <text>{{ tomorrow.weather }}</text>
-          <icon type="{{ tomorrow.icon }}" class="logo"></icon>
+          <text>{{ tomorrow_weather }}</text>
+          <icon type="{{ tomorrow_icon }}" class="logo"></icon>
         </view>
       </view>
     </view>
