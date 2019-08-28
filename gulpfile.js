@@ -2,7 +2,7 @@
  * @Description: gulp config
  * @Author: 执念
  * @Date: 2019-08-27 11:47:30
- * @LastEditTime: 2019-08-27 18:26:56
+ * @LastEditTime: 2019-08-28 09:26:37
  * @LastEditors: Please set LastEditors
  */
 const gulp = require('gulp')
