@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: your name
  * @Date: 2019-08-27 12:26:34
- * @LastEditTime: 2019-08-28 10:18:40
+ * @LastEditTime: 2019-08-28 10:38:47
  * @LastEditors: Please set LastEditors
  */
 import { gecoder, getAir, getWeather, jscode2session } from '../../lib/api-mock';
@@ -39,9 +39,9 @@ Page({
   onLoad: function() {
 
     // 获取天气预报
-    //this.getWeatherData()
+    this.getWeatherData()
     // 获取weather air 信息
-    thi.getWeatherAirData()
+    //this.getWeatherAirData()
     // 计算头部定位地址距离顶部的位置
     wx.getSystemInfo({
       success: (result)=>{
