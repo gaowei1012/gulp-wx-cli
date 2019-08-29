@@ -2,7 +2,7 @@
  * @Description: api mock
  * @Author: 执念
  * @Date: 2019-08-28 09:45:36
- * @LastEditTime: 2019-08-28 15:11:32
+ * @LastEditTime: 2019-08-29 17:45:29
  * @LastEditors: Please set LastEditors
  */
 import Promise from './bluebird';
@@ -20,6 +20,7 @@ export const getWeather = (lat, lon) => {
         lon
       },
       success: (res) => {
+        console.log(res)
         resolve({result: res.data})
       },
       fial: (e) => {

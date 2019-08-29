@@ -2,59 +2,143 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-27 13:06:37
- * @LastEditTime: 2019-08-28 15:16:43
+ * @LastEditTime: 2019-08-29 18:22:57
  * @LastEditors: Please set LastEditors
  */
 import Promise from './bluebird';
 // import request from 'request';
 
 const QQ_MAP_KEY = "MHGBZ-PNXHW-P3TRA-OL7G7-D4I6E-7BFDM";
-const HF_URL = "https://free-api.heweather.net/s6/weather";
-const HF_KEY = "a54b1c81d8e343929a3a79659040a51a";
 
-// wx cloud function
 wx.cloud.init({
-  env: 'tianqi-xxx'
-});
+  env: 'tianqi-xxxxx'
+})
 
-const db = wx.cloud.database();
+const db = wx.cloud.database()
 
-// 逆向坐标地址
-export const gecoder = (lat, lng, success = () => {}, final = () => {}) => {
+export const getEmotionByOpenidAndDate = (openid, year, month) => {
+  const _ = db.command
+  year = parseInt(year)
+  month = parseInt(month)
+  const now = new Date()
+  const curMonth = now.getMonth()
+  const curYear = now.getFullYear()
+  const curDay = now.getDate()
+  let start = new Date(year, month - 1, 1).getTime()
+  let end = new Date(year, month, 1).getTime()
+  // console.log(curYear, curDay, curMonth)
+  if (month - 1 === curMonth && curDay <= 20 && year === curYear) {
+    // 如果是当前月份并且天数少于20，那么就一次取出
+    return db
+      .collection('diary')
+      .where({
+        openid,
+        tsModified: _.gte(start).and(_.lt(end))
+      })
+      .get()
+  }
+
+  // 这里因为限制 limit20，所以查询两次，一共31条（最多31天）记录
+  return new Promise((resolve, reject) => {
+    Promise.all([
+      db
+        .collection('diary')
+        .where({
+          openid,
+          tsModified: _.gte(start).and(_.lt(end))
+        })
+        .orderBy('tsModified', 'desc')
+        .limit(15)
+        .get(),
+      db
+        .collection('diary')
+        .where({
+          openid,
+          tsModified: _.gte(start).and(_.lt(end))
+        })
+        .orderBy('tsModified', 'asc')
+        .limit(16)
+        .get()
+    ])
+      .then((data) => {
+        let [data1, data2] = data
+        let set = new Set()
+        data1 = data1.data || []
+        data2 = data2.data || []
+        data = data1.concat(data2).filter((v) => {
+          if (set.has(v._id)) {
+            return false
+          }
+          set.add(v._id)
+          return true
+        })
+        resolve({data})
+      })
+      .catch((e) => {
+        reject(e)
+      })
+  })
+}
+export const addEmotion = (openid, emotion) => {
+  return db.collection('diary').add({
+    data: {
+      openid,
+      emotion,
+      tsModified: Date.now()
+    }
+  })
+}
+
+/**
+ *  逆经纬度查询
+ * @param {*} lat
+ * @param {*} lon
+ */
+export const geocoder = (lat, lon, success = () => {}, fail = () => {}) => {
   return wx.request({
     url: 'https://apis.map.qq.com/ws/geocoder/v1/',
     data: {
-      location: `${lat},${lng}`,
+      location: `${lat},${lon}`,
       key: QQ_MAP_KEY,
       get_poi: 0
     },
     success,
-    final
+    fail
   })
 }
-
-// 调用微信接口，获取openid
+/**
+ * 调用微信接口获取openid
+ * @param {*} code
+ */
 export const jscode2session = (code) => {
-  // wx clound function 云函数的一种
   return wx.cloud.callFunction({
     name: 'jscode2session',
     data: {
       code
     }
-  });
+  })
 }
-
-// 获取和风天气
-// export const getWeather = (lat, lon) => {
-//   return wx.cloud.callFunction({
-//     name: 'he-weather',
-//     data: {
-//       lat,
-//       lon
-//     }
-//   })
-// }
-
+/**
+ * 获取心情
+ */
+export const getMood = (province, city, county, success = () => {}) => {
+  return wx.request({
+    url: 'https://wis.qq.com/weather/common',
+    data: {
+      source: 'wxa',
+      weather_type: 'tips',
+      province,
+      city,
+      county
+    },
+    success
+  })
+}
+/**
+ * 获取和风天气
+ * @param {*} lat
+ * @param {*} lon
+ */
 export const getWeather = (lat, lon) => {
   return wx.cloud.callFunction({
     name: 'he-weather',
@@ -64,35 +148,15 @@ export const getWeather = (lat, lon) => {
     }
   })
 }
-
-/*
-export const getWeather = (lat, lon) => {
-  let url = `${HF_URL}?location=${lat},${lon}&key=${HF_KEY}`;
-  // let location = `${lat},${lon}`;
-  // let url = `${HF_URL}?localtion=${lat},${lon}&key=`
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: url,
-      // data: {data},
-      headers: {
-        'content-type': 'application/json'
-      },
-      success(res) {
-        // console.log(res)
-        resolve(res)
-      },
-      fial(e) {
-        reject(e)
-      }
-    })
-  })
-}
-*/
-
-// 获取空气质量
+/**
+ * 获取和风空气质量
+ * @param {*} city
+ */
 export const getAir = (city) => {
   return wx.cloud.callFunction({
     name: 'he-air',
-    data: {city}
+    data: {
+      city
+    }
   })
 }

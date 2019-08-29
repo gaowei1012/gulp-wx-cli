@@ -2,7 +2,7 @@
  * @Description: wx cloud server index 
  * @Author: your name
  * @Date: 2019-08-27 18:50:32
- * @LastEditTime: 2019-08-28 17:40:06
+ * @LastEditTime: 2019-08-29 18:07:18
  * @LastEditors: Please set LastEditors
  */
 const path = require('path');
@@ -13,6 +13,7 @@ const heAir = require('./cloud-functions/he-air').main;
 const heWeather = require('./cloud-functions/he-weather').main;
 const gecoder = require('./cloud-functions/geocoder').mian;
 const jscode2session = require('./cloud-functions/jscode2session').main;
+const decrypt = require('./cloud-functions/decrypt').main;
 
 const app = express()
 
@@ -47,6 +48,14 @@ app.get('/api/jscode2session', (req, res, next) => {
     console.error(e)
     next()
   })
+})
+
+app.get('/api/decrypt', (req, res, next) => {
+  decrypt(req.query).then(res.json.bind(res)).catch((e) => {
+    console.error(e)
+    next(e)
+  })
+  // next()
 })
 
 

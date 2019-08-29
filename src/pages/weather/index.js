@@ -1,49 +1,28 @@
-/*
- * @Description: In User Settings Edit
- * @Author: your name
- * @Date: 2019-08-27 12:26:34
- * @LastEditTime: 2019-08-28 17:00:12
- * @LastEditors: Please set LastEditors
- */
-// import {fixChart, getChartConfig, drawEffect} from '../../lib/utils'
-// import Chart from '../../lib/chartjs/chart'
+import {fixChart, getChartConfig, drawEffect} from '../../lib/utils'
+import Chart from '../../lib/chartjs/chart'
 /*<remove trigger="prod">*/
 import {getEmotionByOpenidAndDate, getMood, geocoder} from '../../lib/api'
-import {getWeather ,getAir} from '../../lib/api-mock'
+import {getWeather, getAir} from '../../lib/api-mock'
 /*</remove>*/
 
 /*<jdists trigger="prod">
 import {getEmotionByOpenidAndDate, getMood, geocoder, getWeather, getAir} from '../../lib/api'
 </jdists>*/
 
-// const app = getApp()
-// let prefetchTimer
+const app = getApp()
+let prefetchTimer
 
-// let can = false
-// let effectInstance
-// const EFFECT_CANVAS_HEIGHT = 768 / 2
-// const CHART_CANVAS_HEIGHT = 272 / 2
-// let isUpdate = false
+let can = false
+let effectInstance
+const EFFECT_CANVAS_HEIGHT = 768 / 2
+const CHART_CANVAS_HEIGHT = 272 / 2
+let isUpdate = false
 Page({
   data: {
     // 页面数据
     statusBarHeight: 32,
     backgroundImage: '../../images/cloud.jpg',
     backgroundColor: '#62aadc',
-    today_temp: '0',
-    today_temp_max: '0',
-    today_temp_min: '0',
-    today_weather: '',
-    today_humidity: '1',
-    today_icon: 'xiaolian',
-    today_humidity: '',
-    today_wind: '',
-    today_windLevel: '',
-    tomorrow_temp_max: '0',
-    tomorrow_temp_min: '0',
-    tomorrow_weather: '',
-    tomorrow_icon: '',
-    lifeStyle: [],
     current: {
       temp: '0',
       weather: '数据获取中',
@@ -65,8 +44,8 @@ Page({
     width: 375,
     scale: 1,
     address: '定位中',
-    lat: 31.230939719080258,
-    lon: 121.4849025683968
+    lat: 40.056974,
+    lon: 116.307689
   },
   getWeatherData(cb) {
     wx.showLoading({
@@ -93,25 +72,7 @@ Page({
           cb()
         }
         if (res.result) {
-          // this.render(res.result)
-          // console.log(res.result.now.hum)
-          this.setData({
-            today_temp: res.result.now.tmp, // 温度
-            today_weather: res.result.daily_forecast[0].cond_txt_d, // 天气描述
-            today_humidity: res.result.now.hum, // 湿度
-            today_wind: res.result.now.wind_dir, // 风向
-            today_windLevel: res.result.now.wind_sc, // 风力
-            today_temp_min: res.result.daily_forecast[0].tmp_min,
-            today_temp_max: res.result.daily_forecast[0].tmp_max,
-            today_icon: 'yintian', // icon
-            tomorrow_temp_max: res.result.daily_forecast[1].tmp_max,
-            tomorrow_temp_min: res.result.daily_forecast[1].tmp_min,
-            tomorrow_weather: res.result.daily_forecast[1].cond_txt_d,// 白天天气情况
-            tomorrow_icon: '',
-            // 生活指数
-            lifyStyle: res.result.lifestyle,
-
-          })
+          this.render(res.result)
         } else {
           fail()
         }
@@ -128,8 +89,124 @@ Page({
         }
       })
       .catch((e) => {})
+
+    // 获取心情
+    getMood(province, city, county, (res) => {
+      let result = (res.data || {}).data
+      if (result && result.tips) {
+        let tips = result.tips.observe
+        let index = Math.floor(Math.random() * Object.keys(tips).length)
+        tips = tips[index]
+        this.setData({tips})
+      }
+    })
   },
-  
+  // 处理逆经纬度
+  getAddress(lat, lon, name) {
+    wx.showLoading({
+      title: '定位中',
+      mask: true
+    })
+    let fail = (e) => {
+      // console.log(e)
+      this.setData({
+        address: name || '北京市海淀区西二旗北路'
+      })
+      wx.hideLoading()
+
+      this.getWeatherData()
+    }
+    geocoder(
+      lat,
+      lon,
+      (res) => {
+        wx.hideLoading()
+        let result = (res.data || {}).result
+        // console.log(1, res, result)
+
+        if (res.statusCode === 200 && result && result.address) {
+          let {address, formatted_addresses, address_component} = result
+          if (formatted_addresses && (formatted_addresses.recommend || formatted_addresses.rough)) {
+            address = formatted_addresses.recommend || formatted_addresses.rough
+          }
+          let {province, city, district: county} = address_component
+          this.setData({
+            province,
+            county,
+            city,
+            address: name || address
+          })
+          this.getWeatherData()
+        } else {
+          //失败
+          fail()
+        }
+      },
+      fail
+    )
+  },
+  updateLocation(res) {
+    let {latitude: lat, longitude: lon, name} = res
+    let data = {
+      lat,
+      lon
+    }
+    if (name) {
+      data.address = name
+    }
+    this.setData(data)
+    this.getAddress(lat, lon, name)
+  },
+  getLocation() {
+    wx.getLocation({
+      type: 'gcj02',
+      success: this.updateLocation,
+      fail: (e) => {
+        // console.log(e)
+        this.openLocation()
+      }
+    })
+  },
+  chooseLocation() {
+    wx.chooseLocation({
+      success: (res) => {
+        let {latitude, longitude} = res
+        let {lat, lon} = this.data
+        if (latitude == lat && lon == longitude) {
+          this.getWeatherData()
+        } else {
+          this.updateLocation(res)
+        }
+      }
+    })
+  },
+  openLocation() {
+    wx.showToast({
+      title: '检测到您未授权使用位置权限，请先开启哦',
+      icon: 'none',
+      duration: 3000
+    })
+  },
+  onLocation() {
+    wx.getSetting({
+      success: ({authSetting}) => {
+        can = authSetting['scope.userLocation']
+        if (can) {
+          this.chooseLocation()
+        } else {
+          this.openLocation()
+        }
+      }
+    })
+  },
+  indexDetail(e) {
+    const {name, detail} = e.currentTarget.dataset
+    wx.showModal({
+      title: name,
+      content: detail,
+      showCancel: false
+    })
+  },
   onLoad() {
     wx.getSystemInfo({
       success: (res) => {
@@ -143,71 +220,65 @@ Page({
         })
       }
     })
-    this.getWeatherData()
-    this.getAddress()
-    // 定位获取用户当前位置
-    wx.getLocation({
-      type: 'gcj02',
-      altitude: false,
-      success: (result)=>{
-        let lat = result.latitude
-        let lon = result.longitude
-
-        // this.getAddress(lat, lon)
-      },
-      fail: ()=>{},
-      complete: ()=>{}
-    });
-  },
-  // 获取处理坐标位置
-  getAddress() {
-    wx.showLoading({
-      title: '定位中...',
-      mask: true
-    })
-
-    let fail = (e) => {
-      this.setData({
-        address: '上海市嘉定区华江公路90弄'
-      })
-      wx.hideLoading()
-
-      this.getWeatherData()// 获取数据
-    }
-
-    geocoder(
-      31.230939719080258,
-      121.4849025683968,
-      (res) => {
-        wx.hideLoading()
-        let result = (res.data || {}).result
-        // console.log(1, res, result)
-        console.log(res)
-
-        if (res.statusCode === 200 && result && result.address) {
-          let {address, formatted_addresses, address_component} = result
-          if (formatted_addresses && (formatted_addresses.recommend || formatted_addresses.rough)) {
-            address = formatted_addresses.recommend || formatted_addresses.rough
-          }
-          let {province, city, district: county} = address_component
-          this.setData({
-            province,
-            county,
-            city,
-            address: address
-          })
+    // return
+    // console.log(location, getCurrentPages())
+    const pages = getCurrentPages() //获取加载的页面
+    const currentPage = pages[pages.length - 1] //获取当前页面的对象
+    const query = currentPage.options
+    if (query && query.address && query.lat && query.lon) {
+      let {province, city, county, address, lat, lon} = query
+      this.setData(
+        {
+          city,
+          province,
+          county,
+          address,
+          lat,
+          lon
+        },
+        () => {
           this.getWeatherData()
-        } else {
-          //失败
-          fail()
         }
-      },
-      fail
-    )
+      )
+    } else {
+      // 获取缓存数据
+      this.setDataFromCache()
+      this.getLocation()
+    }
+  },
+  onPullDownRefresh() {
+    this.getWeatherData(() => {
+      wx.stopPullDownRefresh()
+    })
+  },
+  goDiary() {
+    try {
+      let url = `/pages/diary/index`
+      wx.navigateTo({
+        url
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  },
+  onShareAppMessage() {
+    if (!isUpdate) {
+      return {
+        title: '我发现一个好玩的天气小程序，分享给你看看！',
+        path: '/pages/weather/index'
+      }
+    } else {
+      const {lat, lon, address, province, city, county} = this.data
+      let url = `/pages/weather/index?lat=${lat}&lon=${lon}&address=${address}&province=${province}&city=${city}&county=${county}`
 
-  }
+      return {
+        title: `「${address}」现在天气情况，快打开看看吧！`,
+        path: url
+      }
+    }
+  },
 
-  /*
+  //
   render(data) {
     isUpdate = true
     // console.log(data)
@@ -360,5 +431,4 @@ Page({
 
     return new Chart(ctx, getChartConfig(weeklyData))
   }
-  */
 })

@@ -2,7 +2,7 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-27 18:53:03
- * @LastEditTime: 2019-08-28 15:15:17
+ * @LastEditTime: 2019-08-29 18:10:33
  * @LastEditors: Please set LastEditors
  */
 const API_URL = 'https://free-api.heweather.net/s6/weather'
@@ -16,7 +16,7 @@ const $ = require('../../inline/utils')
 
 exports.main = async (event) => {
   const {lat,lon} = event
-  let location = `${31.230939719080258},${121.4849025683968}`
+  let location = `${lat},${lon}`
   let params = {
     location,
     key: 'a54b1c81d8e343929a3a79659040a51a' //和风天气中应用的密钥
@@ -33,9 +33,9 @@ exports.main = async (event) => {
         reject(error)
       } else {
         try {
-          let res = JSON.parse(body)
-          //console.log(res.HeWeather6[0])
-          resolve(res.HeWeather6[0])
+          let rs = $.handlerData(JSON.parse(body))
+          console.log(rs)
+          resolve(rs)
         } catch (e) {
           reject(e)
         }
