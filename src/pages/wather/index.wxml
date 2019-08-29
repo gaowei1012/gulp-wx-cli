@@ -39,7 +39,7 @@
       <view class="item">
         <view class="top">
           <text class="date">今天</text>
-          <text class="temp">{{ today_temp_min }}/{{today_temp_max}}°</text>
+          <text class="temp">{{ today_temp_min }}°/{{today_temp_max}}°</text>
         </view>
         <view class="bottom">
           <text>{{ today_weather }}</text>
@@ -49,7 +49,7 @@
       <view class="item">
         <view class="top">
           <text class="date">明天</text>
-          <text class="temp">{{ tomorrow_temp_min}}/{{tomorrow_temp_max }}°</text>
+          <text class="temp">{{ tomorrow_temp_min}}°/{{tomorrow_temp_max }}°</text>
         </view>
         <view class="bottom">
           <text>{{ tomorrow_weather }}</text>
